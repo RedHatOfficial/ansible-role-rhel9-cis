@@ -1,7 +1,7 @@
-DRAFT CIS Red Hat Enterprise Linux 9 Benchmark for Level 2 - Server
+[DRAFT] CIS Red Hat Enterprise Linux 9 Benchmark for Level 2 - Server
 =========
 
-Ansible Role for DRAFT CIS Red Hat Enterprise Linux 9 Benchmark for Level 2 - Server  
+Ansible Role for [DRAFT] CIS Red Hat Enterprise Linux 9 Benchmark for Level 2 - Server  
   
 Profile Description:  
 This is a draft profile based on its RHEL8 version for experimental purposes.  
