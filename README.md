@@ -1,12 +1,14 @@
-[DRAFT] CIS Red Hat Enterprise Linux 9 Benchmark for Level 2 - Server
+CIS Red Hat Enterprise Linux 9 Benchmark for Level 2 - Server
 =========
 
-Ansible Role for [DRAFT] CIS Red Hat Enterprise Linux 9 Benchmark for Level 2 - Server  
+Ansible Role for CIS Red Hat Enterprise Linux 9 Benchmark for Level 2 - Server  
   
 Profile Description:  
-This is a draft profile based on its RHEL8 version for experimental purposes.  
-It is not based on the CIS benchmark for RHEL9, because this one was not available at time of  
-the release.
+This profile defines a baseline that aligns to the "Level 2 - Server"  
+configuration from the Center for Internet Security® Red Hat Enterprise  
+Linux 9 Benchmark™, v1.0.0, released 2022-11-28.  
+This profile includes Center for Internet Security®  
+Red Hat Enterprise Linux 9 CIS Benchmarks™ content.
 
 The tasks that are used in this role are generated using OpenSCAP.
 See the OpenSCAP project for more details on Ansible playbook generation at [https://github.com/OpenSCAP/openscap](https://github.com/OpenSCAP/openscap)
