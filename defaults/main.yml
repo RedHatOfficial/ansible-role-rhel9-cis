@@ -63,12 +63,14 @@ var_sshd_set_maxstartups: 10:30:60
 account_disable_post_pw_expiration: true
 accounts_maximum_age_login_defs: true
 accounts_minimum_age_login_defs: true
+accounts_no_uid_except_zero: true
 accounts_password_pam_minclass: true
 accounts_password_pam_minlen: true
 accounts_password_pam_pwhistory_remember_password_auth: true
 accounts_password_pam_pwhistory_remember_system_auth: true
 accounts_password_pam_retry: true
 accounts_password_set_max_life_existing: true
+accounts_password_set_min_life_existing: true
 accounts_password_set_warn_age_existing: true
 accounts_password_warn_age_login_defs: true
 accounts_passwords_pam_faillock_deny: true
@@ -119,7 +121,7 @@ audit_rules_privileged_commands: true
 audit_rules_privileged_commands_kmod: true
 audit_rules_privileged_commands_usermod: true
 audit_rules_session_events: true
-audit_rules_suid_privilege_function: true
+audit_rules_suid_auid_privilege_function: true
 audit_rules_sysadmin_actions: true
 audit_rules_time_adjtimex: true
 audit_rules_time_clock_settime: true
@@ -151,6 +153,7 @@ configure_ssh_crypto_policy: true
 configure_strategy: true
 coredump_disable_backtraces: true
 coredump_disable_storage: true
+dconf_db_up_to_date: true
 dconf_gnome_banner_enabled: true
 dconf_gnome_disable_automount: true
 dconf_gnome_disable_automount_open: true
@@ -194,6 +197,8 @@ file_groupowner_user_cfg: true
 file_groupownership_audit_binaries: true
 file_groupownership_audit_configuration: true
 file_groupownership_home_directories: true
+file_groupownership_sshd_private_key: true
+file_groupownership_sshd_pub_key: true
 file_owner_backup_etc_group: true
 file_owner_backup_etc_gshadow: true
 file_owner_backup_etc_passwd: true
@@ -390,5 +395,4 @@ sysctl_net_ipv6_conf_default_accept_redirects: true
 sysctl_net_ipv6_conf_default_accept_source_route: true
 unknown_severity: true
 unknown_strategy: true
-use_pam_wheel_for_su: true
 wireless_disable_interfaces: true
