@@ -463,7 +463,7 @@
   lineinfile:
     dest: /etc/sysconfig/sshd
     state: absent
-    regexp: ^(?i)\s*CRYPTO_POLICY.*$
+    regexp: (?i)^\s*CRYPTO_POLICY.*$
   tags:
   - CCE-83445-7
   - DISA-STIG-RHEL-09-255055
@@ -1879,7 +1879,7 @@
   - low_complexity | bool
   - medium_disruption | bool
   - no_reboot_needed | bool
-  - '"yum" in ansible_facts.packages'
+  - '"dnf" in ansible_facts.packages'
   tags:
   - CCE-83457-2
   - CJIS-5.10.4.1
@@ -6962,7 +6962,7 @@
   - low_disruption | bool
   - medium_severity | bool
   - no_reboot_needed | bool
-  - result_pass_warn_age_user_names.stdout_lines | length > 0
+  - result_pass_warn_age_user_names is not skipped and result_pass_warn_age_user_names.stdout_lines | length > 0
   tags:
   - CCE-86915-6
   - NIST-800-53-CM-6(a)
@@ -7069,7 +7069,7 @@
   - medium_severity | bool
   - no_reboot_needed | bool
   - restrict_strategy | bool
-  - user_names.stdout_lines | length > 0
+  - user_names is not skipped and user_names.stdout_lines | length > 0
   tags:
   - CCE-86759-8
   - NIST-800-171-3.5.6
@@ -7603,7 +7603,7 @@
   replace:
     path: /etc/profile
     regexp: ^[^#].*TMOUT=.*
-    replace: declare -xr TMOUT={{ var_accounts_tmout }}
+    replace: typeset -xr TMOUT={{ var_accounts_tmout }}
   register: profile_replaced
   when:
   - DISA_STIG_RHEL_09_412035 | bool
@@ -7635,7 +7635,7 @@
     path: /etc/profile.d/tmout.sh
     create: true
     regexp: TMOUT=
-    line: declare -xr TMOUT={{ var_accounts_tmout }}
+    line: typeset -xr TMOUT={{ var_accounts_tmout }}
     state: present
   when:
   - DISA_STIG_RHEL_09_412035 | bool
@@ -14024,7 +14024,7 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-  - (log_file_exists.stdout | length > 0)
+  - log_file_exists is not skipped and (log_file_exists.stdout | length > 0)
   tags:
   - CCE-83720-3
   - CJIS-5.4.1.1
@@ -14055,7 +14055,7 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-  - (log_file_exists is undefined) or (log_file_exists.stdout | length == 0)
+  - (log_file_exists is skipped) or (log_file_exists is undefined) or (log_file_exists.stdout | length == 0)
   tags:
   - CCE-83720-3
   - CJIS-5.4.1.1
@@ -14086,7 +14086,7 @@
   - restrict_strategy | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-  - (log_file_line.stdout is defined) and (log_file_line.stdout | length > 0)
+  - (log_file_exists is not skipped) and (log_file_line.stdout is defined) and (log_file_line.stdout | length > 0)
   tags:
   - CCE-83720-3
   - CJIS-5.4.1.1
@@ -25950,8 +25950,8 @@
 - name: Ensure auditd Collects Information on the Use of Privileged Commands - Set List of Privileged Commands Found in Eligible
     Mount Points
   ansible.builtin.set_fact:
-    privileged_commands: '{{( result_privileged_commands_search.results | map(attribute=''stdout_lines'') | select() | list
-      ) | sum(start=[]) }}'
+    privileged_commands: '{{ privileged_commands | default([]) + item.stdout_lines }}'
+  loop: '{{ result_privileged_commands_search.results }}'
   when:
   - audit_rules_privileged_commands | bool
   - configure_strategy | bool
@@ -25961,6 +25961,7 @@
   - no_reboot_needed | bool
   - '"audit" in ansible_facts.packages'
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - item is not skipped
   tags:
   - CCE-83759-1
   - CJIS-5.4.1.1
@@ -27713,7 +27714,7 @@
 - name: Configure auditd admin_space_left Action on Low Disk Space
   lineinfile:
     dest: /etc/audit/auditd.conf
-    line: admin_space_left_action = {{ var_auditd_admin_space_left_action }}
+    line: admin_space_left_action = {{ var_auditd_admin_space_left_action .split('|')[0] }}
     regexp: ^\s*admin_space_left_action\s*=\s*.*$
     state: present
     create: true
@@ -27889,7 +27890,7 @@
 - name: Configure auditd space_left Action on Low Disk Space
   lineinfile:
     dest: /etc/audit/auditd.conf
-    line: space_left_action = {{ var_auditd_space_left_action }}
+    line: space_left_action = {{ var_auditd_space_left_action.split('|')[0] }}
     regexp: ^\s*space_left_action\s*=\s*.*$
     state: present
     create: true
@@ -28723,6 +28724,7 @@
   - no_reboot_needed | bool
   - rsyslog_files_groupownership | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - rsyslog_old_inc is not skipped and rsyslog_new_inc is not skipped
   tags:
   - CCE-83834-2
   - NIST-800-53-AC-6(1)
@@ -28744,9 +28746,6 @@
     hidden: false
     follow: true
   loop: '{{ include_config_output | list + [rsyslog_etc_config] }}'
-  register: rsyslog_config_files
-  failed_when: false
-  changed_when: false
   when:
   - configure_strategy | bool
   - low_complexity | bool
@@ -28755,6 +28754,10 @@
   - no_reboot_needed | bool
   - rsyslog_files_groupownership | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - include_config_output is defined
+  register: rsyslog_config_files
+  failed_when: false
+  changed_when: false
   tags:
   - CCE-83834-2
   - NIST-800-53-AC-6(1)
@@ -28779,7 +28782,7 @@
     sed -e ''s/^-//'' || true
 
     '
-  loop: '{{ rsyslog_config_files.results | subelements(''files'') }}'
+  loop: '{{ rsyslog_config_files.results | default([]) | subelements(''files'') }}'
   register: log_files_old
   changed_when: false
   when:
@@ -28790,6 +28793,7 @@
   - no_reboot_needed | bool
   - rsyslog_files_groupownership | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - rsyslog_config_files is not skipped
   tags:
   - CCE-83834-2
   - NIST-800-53-AC-6(1)
@@ -28816,7 +28820,7 @@
     tr -d "\""|| true
 
     '
-  loop: '{{ rsyslog_config_files.results | subelements(''files'') }}'
+  loop: '{{ rsyslog_config_files.results | default([]) | subelements(''files'') }}'
   register: log_files_new
   changed_when: false
   when:
@@ -28827,6 +28831,7 @@
   - no_reboot_needed | bool
   - rsyslog_files_groupownership | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - rsyslog_config_files is not skipped
   tags:
   - CCE-83834-2
   - NIST-800-53-AC-6(1)
@@ -28993,6 +28998,7 @@
   - no_reboot_needed | bool
   - rsyslog_files_ownership | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - rsyslog_old_inc is not skipped and rsyslog_new_inc is not skipped
   tags:
   - CCE-83946-4
   - NIST-800-53-AC-6(1)
@@ -29014,9 +29020,6 @@
     hidden: false
     follow: true
   loop: '{{ include_config_output | list + [rsyslog_etc_config] }}'
-  register: rsyslog_config_files
-  failed_when: false
-  changed_when: false
   when:
   - configure_strategy | bool
   - low_complexity | bool
@@ -29025,6 +29028,10 @@
   - no_reboot_needed | bool
   - rsyslog_files_ownership | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - include_config_output is defined
+  register: rsyslog_config_files
+  failed_when: false
+  changed_when: false
   tags:
   - CCE-83946-4
   - NIST-800-53-AC-6(1)
@@ -29049,7 +29056,7 @@
     sed -e ''s/^-//'' || true
 
     '
-  loop: '{{ rsyslog_config_files.results | subelements(''files'') }}'
+  loop: '{{ rsyslog_config_files.results | default([]) | subelements(''files'') }}'
   register: log_files_old
   changed_when: false
   when:
@@ -29060,6 +29067,7 @@
   - no_reboot_needed | bool
   - rsyslog_files_ownership | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - rsyslog_config_files is not skipped
   tags:
   - CCE-83946-4
   - NIST-800-53-AC-6(1)
@@ -29086,7 +29094,7 @@
     tr -d "\""|| true
 
     '
-  loop: '{{ rsyslog_config_files.results | subelements(''files'') }}'
+  loop: '{{ rsyslog_config_files.results | default([]) | subelements(''files'') }}'
   register: log_files_new
   changed_when: false
   when:
@@ -29097,6 +29105,7 @@
   - no_reboot_needed | bool
   - rsyslog_files_ownership | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - rsyslog_config_files is not skipped
   tags:
   - CCE-83946-4
   - NIST-800-53-AC-6(1)
@@ -29263,6 +29272,7 @@
   - no_reboot_needed | bool
   - rsyslog_files_permissions | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - rsyslog_old_inc is not skipped and rsyslog_new_inc is not skipped
   tags:
   - CCE-83689-0
   - NIST-800-53-AC-6(1)
@@ -29284,9 +29294,6 @@
     hidden: false
     follow: true
   loop: '{{ include_config_output | list + [rsyslog_etc_config] }}'
-  register: rsyslog_config_files
-  failed_when: false
-  changed_when: false
   when:
   - configure_strategy | bool
   - low_complexity | bool
@@ -29295,6 +29302,10 @@
   - no_reboot_needed | bool
   - rsyslog_files_permissions | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - include_config_output is defined
+  register: rsyslog_config_files
+  failed_when: false
+  changed_when: false
   tags:
   - CCE-83689-0
   - NIST-800-53-AC-6(1)
@@ -29319,7 +29330,7 @@
     sed -e ''s/^-//'' || true
 
     '
-  loop: '{{ rsyslog_config_files.results | subelements(''files'') }}'
+  loop: '{{ rsyslog_config_files.results | default([]) | subelements(''files'') }}'
   register: log_files_old
   changed_when: false
   when:
@@ -29330,6 +29341,7 @@
   - no_reboot_needed | bool
   - rsyslog_files_permissions | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - rsyslog_config_files is not skipped
   tags:
   - CCE-83689-0
   - NIST-800-53-AC-6(1)
@@ -29356,7 +29368,7 @@
     tr -d "\""|| true
 
     '
-  loop: '{{ rsyslog_config_files.results | subelements(''files'') }}'
+  loop: '{{ rsyslog_config_files.results | default([]) | subelements(''files'') }}'
   register: log_files_new
   changed_when: false
   when:
@@ -29367,6 +29379,7 @@
   - no_reboot_needed | bool
   - rsyslog_files_permissions | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - rsyslog_config_files is not skipped
   tags:
   - CCE-83689-0
   - NIST-800-53-AC-6(1)
@@ -29469,33 +29482,15 @@
   - no_reboot_needed
   - service_systemd-journald_enabled
 
-- name: Setting unquoted shell-style assignment of 'Compress' to 'yes' in '/etc/systemd/journald.conf'
-  block:
-  - name: Check for duplicate values
-    lineinfile:
-      path: /etc/systemd/journald.conf
-      create: true
-      regexp: ^\s*Compress=
-      state: absent
-    check_mode: true
-    changed_when: false
-    register: dupes
-  - name: Deduplicate values from /etc/systemd/journald.conf
-    lineinfile:
-      path: /etc/systemd/journald.conf
-      create: true
-      regexp: ^\s*Compress=
-      state: absent
-    when: dupes.found is defined and dupes.found > 1
-  - name: Insert correct line to /etc/systemd/journald.conf
-    lineinfile:
-      path: /etc/systemd/journald.conf
-      create: true
-      regexp: ^\s*Compress=
-      line: Compress=yes
-      state: present
-      insertbefore: ^# Compress
-      validate: /usr/bin/bash -n %s
+- name: Check for duplicate Compress values in master journald configuration
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    create: false
+    regexp: ^\s*Compress=
+    state: absent
+  check_mode: true
+  changed_when: false
+  register: dupes_master
   when:
   - journald_compress | bool
   - low_complexity | bool
@@ -29513,33 +29508,112 @@
   - no_reboot_needed
   - restrict_strategy
 
-- name: Setting unquoted shell-style assignment of 'ForwardToSyslog' to 'yes' in '/etc/systemd/journald.conf'
-  block:
-  - name: Check for duplicate values
-    lineinfile:
-      path: /etc/systemd/journald.conf
-      create: true
-      regexp: ^\s*ForwardToSyslog=
-      state: absent
-    check_mode: true
-    changed_when: false
-    register: dupes
-  - name: Deduplicate values from /etc/systemd/journald.conf
-    lineinfile:
-      path: /etc/systemd/journald.conf
-      create: true
-      regexp: ^\s*ForwardToSyslog=
-      state: absent
-    when: dupes.found is defined and dupes.found > 1
-  - name: Insert correct line to /etc/systemd/journald.conf
-    lineinfile:
-      path: /etc/systemd/journald.conf
-      create: true
-      regexp: ^\s*ForwardToSyslog=
-      line: ForwardToSyslog=yes
-      state: present
-      insertbefore: ^# ForwardToSyslog
-      validate: /usr/bin/bash -n %s
+- name: Deduplicate Compress values from journald master configuration
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    create: false
+    regexp: ^\s*Compress=
+    state: absent
+  when:
+  - journald_compress | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - dupes_master.found is defined and dupes_master.found > 1
+  tags:
+  - CCE-85931-4
+  - journald_compress
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Collect all config journald files which configure Compress
+  ansible.builtin.find:
+    paths: /etc/systemd/journald.conf.d
+    contains: ^[\s]*Compress=.*$
+    patterns: '*.conf'
+  register: journald_Compress_dropin_config_files
+  when:
+  - journald_compress | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-85931-4
+  - journald_compress
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Deduplicate values from journald Compress dropin configuration
+  ansible.builtin.lineinfile:
+    path: '{{ item.path }}'
+    create: false
+    regexp: ^\s*Compress=
+    state: absent
+  loop: '{{  journald_Compress_dropin_config_files.files }}'
+  when:
+  - journald_compress | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-85931-4
+  - journald_compress
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Insert correct line to journald Compress configuration
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf.d/oscap-remedy.conf
+    create: true
+    regexp: ^\s*Compress=
+    line: Compress=yes
+    state: present
+    insertbefore: ^# Compress
+    validate: bash -n %s
+  when:
+  - journald_compress | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-85931-4
+  - journald_compress
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Check for duplicate ForwardToSyslog values in master journald configuration
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    create: false
+    regexp: ^\s*ForwardToSyslog=
+    state: absent
+  check_mode: true
+  changed_when: false
+  register: dupes_master
   when:
   - journald_forward_to_syslog | bool
   - low_complexity | bool
@@ -29557,33 +29631,209 @@
   - no_reboot_needed
   - restrict_strategy
 
-- name: Setting unquoted shell-style assignment of 'Storage' to 'persistent' in '/etc/systemd/journald.conf'
-  block:
-  - name: Check for duplicate values
-    lineinfile:
-      path: /etc/systemd/journald.conf
-      create: true
-      regexp: ^\s*Storage=
-      state: absent
-    check_mode: true
-    changed_when: false
-    register: dupes
-  - name: Deduplicate values from /etc/systemd/journald.conf
-    lineinfile:
-      path: /etc/systemd/journald.conf
-      create: true
-      regexp: ^\s*Storage=
-      state: absent
-    when: dupes.found is defined and dupes.found > 1
-  - name: Insert correct line to /etc/systemd/journald.conf
-    lineinfile:
-      path: /etc/systemd/journald.conf
-      create: true
-      regexp: ^\s*Storage=
-      line: Storage=persistent
-      state: present
-      insertbefore: ^# Storage
-      validate: /usr/bin/bash -n %s
+- name: Deduplicate ForwardToSyslog values from journald master configuration
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    create: false
+    regexp: ^\s*ForwardToSyslog=
+    state: absent
+  when:
+  - journald_forward_to_syslog | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - dupes_master.found is defined and dupes_master.found > 1
+  tags:
+  - CCE-85996-7
+  - journald_forward_to_syslog
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Collect all config journald files which configure ForwardToSyslog
+  ansible.builtin.find:
+    paths: /etc/systemd/journald.conf.d
+    contains: ^[\s]*ForwardToSyslog=.*$
+    patterns: '*.conf'
+  register: journald_ForwardToSyslog_dropin_config_files
+  when:
+  - journald_forward_to_syslog | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-85996-7
+  - journald_forward_to_syslog
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Deduplicate values from journald ForwardToSyslog dropin configuration
+  ansible.builtin.lineinfile:
+    path: '{{ item.path }}'
+    create: false
+    regexp: ^\s*ForwardToSyslog=
+    state: absent
+  loop: '{{  journald_ForwardToSyslog_dropin_config_files.files }}'
+  when:
+  - journald_forward_to_syslog | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-85996-7
+  - journald_forward_to_syslog
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Insert correct line to journald ForwardToSyslog configuration
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf.d/oscap-remedy.conf
+    create: true
+    regexp: ^\s*ForwardToSyslog=
+    line: ForwardToSyslog=yes
+    state: present
+    insertbefore: ^# ForwardToSyslog
+    validate: bash -n %s
+  when:
+  - journald_forward_to_syslog | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-85996-7
+  - journald_forward_to_syslog
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Check for duplicate Storage values in master journald configuration
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    create: false
+    regexp: ^\s*Storage=
+    state: absent
+  check_mode: true
+  changed_when: false
+  register: dupes_master
+  when:
+  - journald_storage | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-86046-0
+  - journald_storage
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Deduplicate Storage values from journald master configuration
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    create: false
+    regexp: ^\s*Storage=
+    state: absent
+  when:
+  - journald_storage | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - dupes_master.found is defined and dupes_master.found > 1
+  tags:
+  - CCE-86046-0
+  - journald_storage
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Collect all config journald files which configure Storage
+  ansible.builtin.find:
+    paths: /etc/systemd/journald.conf.d
+    contains: ^[\s]*Storage=.*$
+    patterns: '*.conf'
+  register: journald_Storage_dropin_config_files
+  when:
+  - journald_storage | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-86046-0
+  - journald_storage
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Deduplicate values from journald Storage dropin configuration
+  ansible.builtin.lineinfile:
+    path: '{{ item.path }}'
+    create: false
+    regexp: ^\s*Storage=
+    state: absent
+  loop: '{{  journald_Storage_dropin_config_files.files }}'
+  when:
+  - journald_storage | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-86046-0
+  - journald_storage
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - restrict_strategy
+
+- name: Insert correct line to journald Storage configuration
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf.d/oscap-remedy.conf
+    create: true
+    regexp: ^\s*Storage=
+    line: Storage=persistent
+    state: present
+    insertbefore: ^# Storage
+    validate: bash -n %s
   when:
   - journald_storage | bool
   - low_complexity | bool
@@ -29956,6 +30206,30 @@
   - medium_severity
   - no_reboot_needed
   - rsyslog_nolisten
+
+- name: Ensure firewalld is installed
+  package:
+    name: firewalld
+    state: present
+  when:
+  - DISA_STIG_RHEL_09_251010 | bool
+  - enable_strategy | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - package_firewalld_installed | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-84021-5
+  - DISA-STIG-RHEL-09-251010
+  - NIST-800-53-CM-6(a)
+  - enable_strategy
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+  - package_firewalld_installed
 
 - name: Gather the package facts
   package_facts:
@@ -32666,6 +32940,7 @@
   - restrict_strategy | bool
   - set_nftables_table | bool
   - '"nftables" in ansible_facts.packages'
+  - existing_nftables is not skipped
   - existing_nftables.stdout_lines | length == 0
   tags:
   - CCE-86163-3
@@ -32681,7 +32956,7 @@
     create: true
     dest: /etc/modprobe.d/tipc.conf
     regexp: install\s+tipc
-    line: install tipc /bin/true
+    line: install tipc /bin/false
   when:
   - DISA_STIG_RHEL_09_213065 | bool
   - disable_strategy | bool
@@ -32763,6 +33038,36 @@
   - unknown_strategy | bool
   - wireless_disable_interfaces | bool
 
+- name: Service facts
+  ansible.builtin.service_facts: null
+  tags:
+  - CCE-84066-0
+  - DISA-STIG-RHEL-09-291040
+  - NIST-800-171-3.1.16
+  - NIST-800-53-AC-18(3)
+  - NIST-800-53-AC-18(a)
+  - NIST-800-53-CM-6(a)
+  - NIST-800-53-CM-7(a)
+  - NIST-800-53-CM-7(b)
+  - NIST-800-53-MP-7
+  - PCI-DSS-Req-1.3.3
+  - PCI-DSSv4-1.3.3
+  - PCI-DSSv4-2.3
+  - low_complexity
+  - medium_disruption
+  - medium_severity
+  - no_reboot_needed
+  - unknown_strategy
+  - wireless_disable_interfaces
+  when:
+  - DISA_STIG_RHEL_09_291040 | bool
+  - low_complexity | bool
+  - medium_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - unknown_strategy | bool
+  - wireless_disable_interfaces | bool
+
 - name: Ensure NetworkManager is installed
   ansible.builtin.package:
     name: '{{ item }}'
@@ -32797,7 +33102,7 @@
   - unknown_strategy | bool
   - wireless_disable_interfaces | bool
 
-- name: Deactivate Wireless Network Interfaces
+- name: NetworkManager Deactivate Wireless Network Interfaces
   command: nmcli radio wifi off
   when:
   - DISA_STIG_RHEL_09_291040 | bool
@@ -32808,6 +33113,7 @@
   - unknown_strategy | bool
   - wireless_disable_interfaces | bool
   - '''NetworkManager'' in ansible_facts.packages'
+  - ansible_facts.services['NetworkManager.service'].state == 'running'
   tags:
   - CCE-84066-0
   - DISA-STIG-RHEL-09-291040
@@ -33044,6 +33350,15 @@
   ansible.builtin.set_fact:
     world_writable_dirs: '{{ world_writable_dirs | union(item.stdout_lines) | list }}'
   loop: '{{ result_found_dirs.results }}'
+  when:
+  - DISA_STIG_RHEL_09_232245 | bool
+  - dir_perms_world_writable_sticky_bits | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - restrict_strategy | bool
+  - result_found_dirs is not skipped and item is not skipped
   tags:
   - CCE-83895-3
   - DISA-STIG-RHEL-09-232245
@@ -33056,14 +33371,6 @@
   - medium_severity
   - no_reboot_needed
   - restrict_strategy
-  when:
-  - DISA_STIG_RHEL_09_232245 | bool
-  - dir_perms_world_writable_sticky_bits | bool
-  - low_complexity | bool
-  - low_disruption | bool
-  - medium_severity | bool
-  - no_reboot_needed | bool
-  - restrict_strategy | bool
 
 - name: Verify that All World-Writable Directories Have Sticky Bits Set - Ensure Sticky Bit is Set on Local World Writable
     Directories
@@ -35206,7 +35513,7 @@
     create: true
     dest: /etc/modprobe.d/squashfs.conf
     regexp: install\s+squashfs
-    line: install squashfs /bin/true
+    line: install squashfs /bin/false
   when:
   - disable_strategy | bool
   - kernel_module_squashfs_disabled | bool
@@ -35260,7 +35567,7 @@
     create: true
     dest: /etc/modprobe.d/udf.conf
     regexp: install\s+udf
-    line: install udf /bin/true
+    line: install udf /bin/false
   when:
   - disable_strategy | bool
   - kernel_module_udf_disabled | bool
@@ -35314,7 +35621,7 @@
     create: true
     dest: /etc/modprobe.d/usb-storage.conf
     regexp: install\s+usb-storage
-    line: install usb-storage /bin/true
+    line: install usb-storage /bin/false
   when:
   - DISA_STIG_RHEL_09_291010 | bool
   - disable_strategy | bool
@@ -35454,6 +35761,7 @@
   - no_reboot_needed | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   - ("" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83881-3
@@ -35516,6 +35824,7 @@
   - mount_option_dev_shm_nodev | bool
   - no_reboot_needed | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("" | length == 0)
   tags:
   - CCE-83881-3
@@ -35618,6 +35927,7 @@
   - no_reboot_needed | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   - ("" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83857-3
@@ -35680,6 +35990,7 @@
   - mount_option_dev_shm_noexec | bool
   - no_reboot_needed | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("" | length == 0)
   tags:
   - CCE-83857-3
@@ -35782,6 +36093,7 @@
   - no_reboot_needed | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   - ("" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83891-2
@@ -35844,6 +36156,7 @@
   - mount_option_dev_shm_nosuid | bool
   - no_reboot_needed | bool
   - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("" | length == 0)
   tags:
   - CCE-83891-2
@@ -35937,6 +36250,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/home" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83871-4
@@ -35989,6 +36303,7 @@
   - unknown_severity | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/home" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83871-4
@@ -36088,6 +36403,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/home" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83894-6
@@ -36152,6 +36468,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/home" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83894-6
@@ -36257,6 +36574,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/tmp" in ansible_mounts |
     map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83869-8
@@ -36321,6 +36639,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/tmp" in ansible_mounts |
     map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83869-8
@@ -36426,6 +36745,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/tmp" in ansible_mounts |
     map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83885-4
@@ -36490,6 +36810,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/tmp" in ansible_mounts |
     map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83885-4
@@ -36595,6 +36916,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/tmp" in ansible_mounts |
     map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83872-2
@@ -36659,6 +36981,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/tmp" in ansible_mounts |
     map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83872-2
@@ -36764,6 +37087,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83882-1
@@ -36828,6 +37152,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83882-1
@@ -36933,6 +37258,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83878-9
@@ -36997,6 +37323,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83878-9
@@ -37102,6 +37429,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83893-8
@@ -37166,6 +37494,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log/audit" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83893-8
@@ -37271,6 +37600,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83886-2
@@ -37335,6 +37665,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83886-2
@@ -37440,6 +37771,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83887-0
@@ -37504,6 +37836,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83887-0
@@ -37609,6 +37942,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83870-6
@@ -37673,6 +38007,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/log" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83870-6
@@ -37778,6 +38113,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var" in ansible_mounts |
     map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83868-0
@@ -37842,6 +38178,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var" in ansible_mounts |
     map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83868-0
@@ -37930,6 +38267,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var" in ansible_mounts |
     map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83867-2
@@ -37978,6 +38316,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var" in ansible_mounts |
     map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83867-2
@@ -38064,6 +38403,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/tmp" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83864-9
@@ -38116,6 +38456,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/tmp" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83864-9
@@ -38203,6 +38544,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/tmp" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83866-4
@@ -38255,6 +38597,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/tmp" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83866-4
@@ -38342,6 +38685,7 @@
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/tmp" in ansible_mounts
     | map(attribute="mount") | list )
   - ("--fstab" | length == 0)
+  - device_name.stdout is defined and device_name.stdout_lines is defined
   - (device_name.stdout | length == 0)
   tags:
   - CCE-83863-1
@@ -38394,6 +38738,7 @@
   - no_reboot_needed | bool
   - ( ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"] and "/var/tmp" in ansible_mounts
     | map(attribute="mount") | list )
+  - mount_info is defined
   - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
   - CCE-83863-1
@@ -39829,6 +40174,29 @@
   - PCI-DSSv4-2.2.6
   - disable_strategy
   - file_at_deny_not_exist
+  - low_complexity
+  - low_disruption
+  - medium_severity
+  - no_reboot_needed
+
+- name: Add empty /etc/cron.allow
+  file:
+    path: /etc/cron.allow
+    state: touch
+    owner: '0'
+    mode: '0600'
+  when:
+  - disable_strategy | bool
+  - file_cron_allow_exists | bool
+  - low_complexity | bool
+  - low_disruption | bool
+  - medium_severity | bool
+  - no_reboot_needed | bool
+  - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+  - CCE-86185-6
+  - disable_strategy
+  - file_cron_allow_exists
   - low_complexity
   - low_disruption
   - medium_severity
