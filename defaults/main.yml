@@ -123,6 +123,7 @@ DISA_STIG_RHEL_09_232235: true
 DISA_STIG_RHEL_09_232245: true
 DISA_STIG_RHEL_09_232265: true
 DISA_STIG_RHEL_09_232270: true
+DISA_STIG_RHEL_09_251010: true
 DISA_STIG_RHEL_09_251015: true
 DISA_STIG_RHEL_09_253010: true
 DISA_STIG_RHEL_09_253015: true
@@ -350,6 +351,7 @@ enable_strategy: true
 ensure_gpgcheck_globally_activated: true
 ensure_pam_wheel_group_empty: true
 file_at_deny_not_exist: true
+file_cron_allow_exists: true
 file_cron_deny_not_exist: true
 file_groupowner_at_allow: true
 file_groupowner_backup_etc_group: true
@@ -485,6 +487,7 @@ package_cyrus_imapd_removed: true
 package_dhcp_removed: true
 package_dnsmasq_removed: true
 package_dovecot_removed: true
+package_firewalld_installed: true
 package_ftp_removed: true
 package_gdm_removed: true
 package_httpd_removed: true
