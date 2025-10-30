@@ -6,9 +6,8 @@ var_screensaver_lock_delay: '5'
 var_sudo_logfile: /var/log/sudo.log
 var_sudo_timestamp_timeout: '5'
 var_authselect_profile: sssd
-login_banner_text: ^(Authorized[\s\n]+uses[\s\n]+only\.[\s\n]+All[\s\n]+activity[\s\n]+may[\s\n]+be[\s\n]+monitored[\s\n]+and[\s\n]+reported\.|^(?!.*(\\|fedora|rhel|sle|ubuntu)).*)$
-remote_login_banner_text: ^(Authorized[\s\n]+uses[\s\n]+only\.[\s\n]+All[\s\n]+activity[\s\n]+may[\s\n]+be[\s\n]+monitored[\s\n]+and[\s\n]+reported\.|^(?!.*(\\|fedora|rhel|sle|ubuntu)).*)$
-motd_banner_text: ^(Authorized[\s\n]+uses[\s\n]+only\.[\s\n]+All[\s\n]+activity[\s\n]+may[\s\n]+be[\s\n]+monitored[\s\n]+and[\s\n]+reported\.|^(?!.*(\\|fedora|rhel|sle|ubuntu)).*)$
+cis_banner_text: Authorized users only. All activity may be monitored and reported.
+login_banner_text: ^(Authorized[\s\n]+users[\s\n]+only\.[\s\n]+All[\s\n]+activity[\s\n]+may[\s\n]+be[\s\n]+monitored[\s\n]+and[\s\n]+reported\.|^(?!.*(\\|fedora|rhel|sle|ubuntu)).*)$
 var_password_pam_remember: '24'
 var_password_pam_remember_control_flag: requisite,required
 var_accounts_passwords_pam_faillock_deny: '5'
@@ -68,7 +67,6 @@ var_auditd_admin_space_left_action: single|halt
 var_auditd_max_log_file: '6'
 var_auditd_max_log_file_action: keep_logs
 var_auditd_space_left_action: email|exec|single|halt
-DISA_STIG_RHEL_09_211020: true
 DISA_STIG_RHEL_09_211030: true
 DISA_STIG_RHEL_09_211040: true
 DISA_STIG_RHEL_09_212025: true
@@ -137,6 +135,7 @@ DISA_STIG_RHEL_09_232265: true
 DISA_STIG_RHEL_09_232270: true
 DISA_STIG_RHEL_09_251010: true
 DISA_STIG_RHEL_09_251015: true
+DISA_STIG_RHEL_09_252010: true
 DISA_STIG_RHEL_09_252020: true
 DISA_STIG_RHEL_09_253010: true
 DISA_STIG_RHEL_09_253015: true
@@ -162,7 +161,6 @@ DISA_STIG_RHEL_09_255030: true
 DISA_STIG_RHEL_09_255040: true
 DISA_STIG_RHEL_09_255045: true
 DISA_STIG_RHEL_09_255050: true
-DISA_STIG_RHEL_09_255055: true
 DISA_STIG_RHEL_09_255080: true
 DISA_STIG_RHEL_09_255085: true
 DISA_STIG_RHEL_09_255095: true
@@ -206,8 +204,6 @@ DISA_STIG_RHEL_09_431010: true
 DISA_STIG_RHEL_09_431015: true
 DISA_STIG_RHEL_09_432010: true
 DISA_STIG_RHEL_09_432015: true
-DISA_STIG_RHEL_09_611015: true
-DISA_STIG_RHEL_09_611020: true
 DISA_STIG_RHEL_09_611025: true
 DISA_STIG_RHEL_09_611030: true
 DISA_STIG_RHEL_09_611035: true
@@ -352,9 +348,9 @@ auditd_data_retention_admin_space_left_action: true
 auditd_data_retention_max_log_file: true
 auditd_data_retention_max_log_file_action: true
 auditd_data_retention_space_left_action: true
-banner_etc_issue: true
-banner_etc_issue_net: true
-banner_etc_motd: true
+banner_etc_issue_cis: true
+banner_etc_issue_net_cis: true
+banner_etc_motd_cis: true
 chronyd_run_as_chrony_user: true
 chronyd_specify_remote_server: true
 configure_crypto_policy: true
@@ -522,6 +518,7 @@ package_aide_installed: true
 package_audit_installed: true
 package_audit_libs_installed: true
 package_bind_removed: true
+package_chrony_installed: true
 package_cyrus_imapd_removed: true
 package_dhcp_removed: true
 package_dnsmasq_removed: true
