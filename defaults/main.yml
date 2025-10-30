@@ -67,6 +67,7 @@ var_auditd_admin_space_left_action: single|halt
 var_auditd_max_log_file: '6'
 var_auditd_max_log_file_action: keep_logs
 var_auditd_space_left_action: email|exec|single|halt
+DISA_STIG_RHEL_09_171011: true
 DISA_STIG_RHEL_09_211030: true
 DISA_STIG_RHEL_09_211040: true
 DISA_STIG_RHEL_09_212025: true
@@ -83,6 +84,7 @@ DISA_STIG_RHEL_09_215015: true
 DISA_STIG_RHEL_09_215030: true
 DISA_STIG_RHEL_09_215040: true
 DISA_STIG_RHEL_09_215060: true
+DISA_STIG_RHEL_09_215105: true
 DISA_STIG_RHEL_09_231040: true
 DISA_STIG_RHEL_09_231045: true
 DISA_STIG_RHEL_09_231050: true
@@ -115,6 +117,8 @@ DISA_STIG_RHEL_09_232085: true
 DISA_STIG_RHEL_09_232090: true
 DISA_STIG_RHEL_09_232095: true
 DISA_STIG_RHEL_09_232100: true
+DISA_STIG_RHEL_09_232103: true
+DISA_STIG_RHEL_09_232104: true
 DISA_STIG_RHEL_09_232105: true
 DISA_STIG_RHEL_09_232110: true
 DISA_STIG_RHEL_09_232115: true
@@ -161,6 +165,8 @@ DISA_STIG_RHEL_09_255030: true
 DISA_STIG_RHEL_09_255040: true
 DISA_STIG_RHEL_09_255045: true
 DISA_STIG_RHEL_09_255050: true
+DISA_STIG_RHEL_09_255070: true
+DISA_STIG_RHEL_09_255075: true
 DISA_STIG_RHEL_09_255080: true
 DISA_STIG_RHEL_09_255085: true
 DISA_STIG_RHEL_09_255095: true
@@ -227,6 +233,7 @@ DISA_STIG_RHEL_09_653040: true
 DISA_STIG_RHEL_09_653050: true
 DISA_STIG_RHEL_09_653070: true
 DISA_STIG_RHEL_09_653090: true
+DISA_STIG_RHEL_09_653110: true
 DISA_STIG_RHEL_09_653120: true
 DISA_STIG_RHEL_09_654015: true
 DISA_STIG_RHEL_09_654020: true
@@ -251,7 +258,6 @@ DISA_STIG_RHEL_09_654275: true
 DISA_STIG_RHEL_09_671010: true
 DISA_STIG_RHEL_09_671025: true
 DISA_STIG_RHEL_09_672030: true
-DISA_STIG_RHEL_09_672045: true
 DISA_STIG_needed_rules: true
 account_disable_post_pw_expiration: true
 account_password_pam_faillock_password_auth: true
@@ -519,6 +525,7 @@ package_audit_installed: true
 package_audit_libs_installed: true
 package_bind_removed: true
 package_chrony_installed: true
+package_cron_installed: true
 package_cyrus_imapd_removed: true
 package_dhcp_removed: true
 package_dnsmasq_removed: true
