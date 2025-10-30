@@ -80,6 +80,7 @@ DISA_STIG_RHEL_09_213080: true
 DISA_STIG_RHEL_09_213085: true
 DISA_STIG_RHEL_09_213090: true
 DISA_STIG_RHEL_09_214015: true
+DISA_STIG_RHEL_09_214025: true
 DISA_STIG_RHEL_09_215015: true
 DISA_STIG_RHEL_09_215040: true
 DISA_STIG_RHEL_09_215060: true
@@ -251,7 +252,6 @@ DISA_STIG_RHEL_09_654245: true
 DISA_STIG_RHEL_09_654250: true
 DISA_STIG_RHEL_09_654255: true
 DISA_STIG_RHEL_09_654275: true
-DISA_STIG_RHEL_09_671010: true
 DISA_STIG_RHEL_09_671025: true
 DISA_STIG_RHEL_09_672030: true
 DISA_STIG_needed_rules: true
@@ -341,7 +341,10 @@ audit_rules_unsuccessful_file_modification_openat: true
 audit_rules_unsuccessful_file_modification_truncate: true
 audit_rules_usergroup_modification_group: true
 audit_rules_usergroup_modification_gshadow: true
+audit_rules_usergroup_modification_nsswitch_conf: true
 audit_rules_usergroup_modification_opasswd: true
+audit_rules_usergroup_modification_pam_conf: true
+audit_rules_usergroup_modification_pamd: true
 audit_rules_usergroup_modification_passwd: true
 audit_rules_usergroup_modification_shadow: true
 audit_sudo_log_events: true
@@ -379,6 +382,7 @@ disable_strategy: true
 enable_authselect: true
 enable_strategy: true
 ensure_gpgcheck_globally_activated: true
+ensure_gpgcheck_never_disabled: true
 ensure_pam_wheel_group_empty: true
 file_at_deny_not_exist: true
 file_cron_allow_exists: true
@@ -575,6 +579,7 @@ set_password_hashing_algorithm_libuserconf: true
 set_password_hashing_algorithm_logindefs: true
 set_password_hashing_algorithm_passwordauth: true
 set_password_hashing_algorithm_systemauth: true
+special_service_block: true
 sshd_disable_empty_passwords: true
 sshd_disable_gssapi_auth: true
 sshd_disable_rhosts: true
