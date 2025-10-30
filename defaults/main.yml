@@ -81,7 +81,6 @@ DISA_STIG_RHEL_09_213085: true
 DISA_STIG_RHEL_09_213090: true
 DISA_STIG_RHEL_09_214015: true
 DISA_STIG_RHEL_09_215015: true
-DISA_STIG_RHEL_09_215030: true
 DISA_STIG_RHEL_09_215040: true
 DISA_STIG_RHEL_09_215060: true
 DISA_STIG_RHEL_09_215105: true
@@ -135,7 +134,6 @@ DISA_STIG_RHEL_09_232165: true
 DISA_STIG_RHEL_09_232230: true
 DISA_STIG_RHEL_09_232235: true
 DISA_STIG_RHEL_09_232245: true
-DISA_STIG_RHEL_09_232265: true
 DISA_STIG_RHEL_09_232270: true
 DISA_STIG_RHEL_09_251010: true
 DISA_STIG_RHEL_09_251015: true
@@ -165,8 +163,6 @@ DISA_STIG_RHEL_09_255030: true
 DISA_STIG_RHEL_09_255040: true
 DISA_STIG_RHEL_09_255045: true
 DISA_STIG_RHEL_09_255050: true
-DISA_STIG_RHEL_09_255070: true
-DISA_STIG_RHEL_09_255075: true
 DISA_STIG_RHEL_09_255080: true
 DISA_STIG_RHEL_09_255085: true
 DISA_STIG_RHEL_09_255095: true
@@ -329,7 +325,9 @@ audit_rules_networkconfig_modification_network_scripts: true
 audit_rules_privileged_commands: true
 audit_rules_privileged_commands_kmod: true
 audit_rules_privileged_commands_usermod: true
-audit_rules_session_events: true
+audit_rules_session_events_btmp: true
+audit_rules_session_events_utmp: true
+audit_rules_session_events_wtmp: true
 audit_rules_suid_auid_privilege_function: true
 audit_rules_sysadmin_actions: true
 audit_rules_time_adjtimex: true
@@ -552,10 +550,7 @@ package_telnet_server_removed: true
 package_tftp_removed: true
 package_tftp_server_removed: true
 package_vsftpd_removed: true
-package_xinetd_removed: true
 package_xorg_x11_server_common_removed: true
-package_ypbind_removed: true
-package_ypserv_removed: true
 postfix_network_listening_disabled: true
 reboot_required: true
 restrict_strategy: true
