@@ -1,6 +1,5 @@
 ---
 # defaults file for rhel9_cis
-var_system_crypto_policy: DEFAULT:NO-SHA1
 inactivity_timeout_value: '900'
 var_screensaver_lock_delay: '5'
 var_sudo_logfile: /var/log/sudo.log
@@ -15,6 +14,7 @@ var_accounts_passwords_pam_faillock_unlock_time: '900'
 var_password_pam_dictcheck: '1'
 var_password_pam_difok: '2'
 var_password_pam_maxrepeat: '3'
+var_password_pam_maxsequence: '3'
 var_password_pam_minclass: '4'
 var_password_pam_minlen: '14'
 var_password_hashing_algorithm_pam: sha512
@@ -58,7 +58,7 @@ sshd_max_auth_tries_value: '4'
 var_sshd_max_sessions: '10'
 var_sshd_set_maxstartups: 10:30:60
 sshd_strong_kex: -diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1
-sshd_strong_macs: -hmac-md5,hmac-md5-96,hmac-ripemd160,hmac-sha1-96,umac-64@openssh.com,hmac-md5-etm@openssh.com,hmac-md5-96-etm@openssh.com,hmac-ripemd160-etm@openssh.com,hmac-sha1-96-etm@openssh.com,umac-64-etm@openssh.com
+var_audit_backlog_limit: '8192'
 var_accounts_passwords_pam_faillock_dir: /var/run/faillock
 var_auditd_disk_error_action: syslog|single|halt
 var_auditd_disk_full_action: halt|single
@@ -84,7 +84,6 @@ DISA_STIG_RHEL_09_214025: true
 DISA_STIG_RHEL_09_215015: true
 DISA_STIG_RHEL_09_215040: true
 DISA_STIG_RHEL_09_215060: true
-DISA_STIG_RHEL_09_215105: true
 DISA_STIG_RHEL_09_231040: true
 DISA_STIG_RHEL_09_231045: true
 DISA_STIG_RHEL_09_231050: true
@@ -222,7 +221,6 @@ DISA_STIG_RHEL_09_611135: true
 DISA_STIG_RHEL_09_611140: true
 DISA_STIG_RHEL_09_611155: true
 DISA_STIG_RHEL_09_651010: true
-DISA_STIG_RHEL_09_651015: true
 DISA_STIG_RHEL_09_651025: true
 DISA_STIG_RHEL_09_653010: true
 DISA_STIG_RHEL_09_653015: true
@@ -253,7 +251,6 @@ DISA_STIG_RHEL_09_654250: true
 DISA_STIG_RHEL_09_654255: true
 DISA_STIG_RHEL_09_654275: true
 DISA_STIG_RHEL_09_671025: true
-DISA_STIG_RHEL_09_672030: true
 DISA_STIG_needed_rules: true
 account_disable_post_pw_expiration: true
 account_password_pam_faillock_password_auth: true
@@ -265,6 +262,7 @@ accounts_password_pam_dictcheck: true
 accounts_password_pam_difok: true
 accounts_password_pam_enforce_root: true
 accounts_password_pam_maxrepeat: true
+accounts_password_pam_maxsequence: true
 accounts_password_pam_minclass: true
 accounts_password_pam_minlen: true
 accounts_password_pam_pwhistory_remember_password_auth: true
@@ -321,7 +319,9 @@ audit_rules_mac_modification: true
 audit_rules_mac_modification_usr_share: true
 audit_rules_media_export: true
 audit_rules_networkconfig_modification: true
+audit_rules_networkconfig_modification_hostname_file: true
 audit_rules_networkconfig_modification_network_scripts: true
+audit_rules_networkconfig_modification_networkmanager: true
 audit_rules_privileged_commands: true
 audit_rules_privileged_commands_kmod: true
 audit_rules_privileged_commands_usermod: true
@@ -360,7 +360,7 @@ banner_etc_issue_net_cis: true
 banner_etc_motd_cis: true
 chronyd_run_as_chrony_user: true
 chronyd_specify_remote_server: true
-configure_crypto_policy: true
+configure_custom_crypto_policy_cis: true
 configure_ssh_crypto_policy: true
 configure_strategy: true
 coredump_disable_backtraces: true
@@ -384,9 +384,11 @@ enable_strategy: true
 ensure_gpgcheck_globally_activated: true
 ensure_gpgcheck_never_disabled: true
 ensure_pam_wheel_group_empty: true
+file_at_allow_exists: true
 file_at_deny_not_exist: true
 file_cron_allow_exists: true
 file_cron_deny_not_exist: true
+file_etc_security_opasswd: true
 file_groupowner_at_allow: true
 file_groupowner_backup_etc_group: true
 file_groupowner_backup_etc_gshadow: true
@@ -581,6 +583,7 @@ set_password_hashing_algorithm_passwordauth: true
 set_password_hashing_algorithm_systemauth: true
 special_service_block: true
 sshd_disable_empty_passwords: true
+sshd_disable_forwarding: true
 sshd_disable_gssapi_auth: true
 sshd_disable_rhosts: true
 sshd_disable_root_login: true
@@ -595,7 +598,6 @@ sshd_set_max_auth_tries: true
 sshd_set_max_sessions: true
 sshd_set_maxstartups: true
 sshd_use_strong_kex: true
-sshd_use_strong_macs: true
 sudo_add_use_pty: true
 sudo_custom_logfile: true
 sudo_require_authentication: true
