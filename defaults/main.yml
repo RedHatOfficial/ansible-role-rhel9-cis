@@ -3,7 +3,7 @@
 inactivity_timeout_value: '900'
 var_screensaver_lock_delay: '5'
 var_sudo_logfile: /var/log/sudo.log
-var_sudo_timestamp_timeout: '5'
+var_sudo_timestamp_timeout: '15'
 var_authselect_profile: sssd
 cis_banner_text: Authorized users only. All activity may be monitored and reported.
 login_banner_text: ^(Authorized[\s\n]+users[\s\n]+only\.[\s\n]+All[\s\n]+activity[\s\n]+may[\s\n]+be[\s\n]+monitored[\s\n]+and[\s\n]+reported\.|^(?!.*(\\|fedora|rhel|sle|ubuntu)).*)$
@@ -57,7 +57,6 @@ var_sshd_set_login_grace_time: '60'
 sshd_max_auth_tries_value: '4'
 var_sshd_max_sessions: '10'
 var_sshd_set_maxstartups: 10:30:60
-sshd_strong_kex: -diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1
 var_audit_backlog_limit: '8192'
 var_accounts_passwords_pam_faillock_dir: /var/run/faillock
 var_auditd_disk_error_action: syslog|single|halt
@@ -197,7 +196,6 @@ DISA_STIG_RHEL_09_411075: true
 DISA_STIG_RHEL_09_411080: true
 DISA_STIG_RHEL_09_411090: true
 DISA_STIG_RHEL_09_411100: true
-DISA_STIG_RHEL_09_411115: true
 DISA_STIG_RHEL_09_412035: true
 DISA_STIG_RHEL_09_412055: true
 DISA_STIG_RHEL_09_412065: true
@@ -206,12 +204,14 @@ DISA_STIG_RHEL_09_431010: true
 DISA_STIG_RHEL_09_431015: true
 DISA_STIG_RHEL_09_432010: true
 DISA_STIG_RHEL_09_432015: true
+DISA_STIG_RHEL_09_432025: true
 DISA_STIG_RHEL_09_611025: true
 DISA_STIG_RHEL_09_611030: true
 DISA_STIG_RHEL_09_611035: true
 DISA_STIG_RHEL_09_611060: true
 DISA_STIG_RHEL_09_611075: true
 DISA_STIG_RHEL_09_611080: true
+DISA_STIG_RHEL_09_611085: true
 DISA_STIG_RHEL_09_611090: true
 DISA_STIG_RHEL_09_611105: true
 DISA_STIG_RHEL_09_611115: true
@@ -265,8 +265,11 @@ accounts_password_pam_maxrepeat: true
 accounts_password_pam_maxsequence: true
 accounts_password_pam_minclass: true
 accounts_password_pam_minlen: true
+accounts_password_pam_modules_in_authselect_profile: true
+accounts_password_pam_pwhistory_enforce_for_root: true
 accounts_password_pam_pwhistory_remember_password_auth: true
 accounts_password_pam_pwhistory_remember_system_auth: true
+accounts_password_pam_unix_no_remember: true
 accounts_password_set_max_life_existing: true
 accounts_password_set_min_life_existing: true
 accounts_password_set_warn_age_existing: true
@@ -281,7 +284,6 @@ accounts_umask_etc_bashrc: true
 accounts_umask_etc_login_defs: true
 accounts_umask_etc_profile: true
 accounts_user_dot_group_ownership: true
-accounts_user_dot_no_world_writable_programs: true
 accounts_user_dot_user_ownership: true
 accounts_user_interactive_home_directory_exists: true
 aide_build_database: true
@@ -361,7 +363,6 @@ banner_etc_motd_cis: true
 chronyd_run_as_chrony_user: true
 chronyd_specify_remote_server: true
 configure_custom_crypto_policy_cis: true
-configure_ssh_crypto_policy: true
 configure_strategy: true
 coredump_disable_backtraces: true
 coredump_disable_storage: true
@@ -377,6 +378,7 @@ dconf_gnome_screensaver_lock_delay: true
 dconf_gnome_screensaver_user_locks: true
 dconf_gnome_session_idle_user_locks: true
 dir_perms_world_writable_sticky_bits: true
+directory_permissions_var_log_audit: true
 disable_host_auth: true
 disable_strategy: true
 enable_authselect: true
@@ -532,7 +534,6 @@ package_chrony_installed: true
 package_cron_installed: true
 package_cyrus_imapd_removed: true
 package_dhcp_removed: true
-package_dnsmasq_removed: true
 package_dovecot_removed: true
 package_firewalld_installed: true
 package_ftp_removed: true
@@ -572,6 +573,7 @@ service_avahi_daemon_disabled: true
 service_bluetooth_disabled: true
 service_crond_enabled: true
 service_cups_disabled: true
+service_dnsmasq_disabled: true
 service_firewalld_enabled: true
 service_nfs_disabled: true
 service_nftables_disabled: true
@@ -597,10 +599,10 @@ sshd_set_loglevel_verbose: true
 sshd_set_max_auth_tries: true
 sshd_set_max_sessions: true
 sshd_set_maxstartups: true
-sshd_use_strong_kex: true
 sudo_add_use_pty: true
 sudo_custom_logfile: true
-sudo_require_authentication: true
+sudo_remove_no_authenticate: true
+sudo_remove_nopasswd: true
 sudo_require_reauthentication: true
 sysctl_kernel_randomize_va_space: true
 sysctl_kernel_yama_ptrace_scope: true
