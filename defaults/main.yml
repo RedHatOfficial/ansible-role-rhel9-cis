@@ -6,7 +6,7 @@ var_sudo_logfile: /var/log/sudo.log
 var_sudo_timestamp_timeout: '15'
 var_authselect_profile: sssd
 cis_banner_text: Authorized users only. All activity may be monitored and reported.
-login_banner_text: ^(Authorized[\s\n]+users[\s\n]+only\.[\s\n]+All[\s\n]+activity[\s\n]+may[\s\n]+be[\s\n]+monitored[\s\n]+and[\s\n]+reported\.|^(?!.*(\\|fedora|rhel|sle|ubuntu)).*)$
+dconf_login_banner_contents: Authorized uses only. All activity may be monitored and reported.
 var_password_pam_remember: '24'
 var_password_pam_remember_control_flag: requisite,required
 var_accounts_passwords_pam_faillock_deny: '5'
@@ -78,11 +78,13 @@ DISA_STIG_RHEL_09_213070: true
 DISA_STIG_RHEL_09_213080: true
 DISA_STIG_RHEL_09_213085: true
 DISA_STIG_RHEL_09_213090: true
+DISA_STIG_RHEL_09_214010: true
 DISA_STIG_RHEL_09_214015: true
 DISA_STIG_RHEL_09_214025: true
 DISA_STIG_RHEL_09_215015: true
 DISA_STIG_RHEL_09_215040: true
 DISA_STIG_RHEL_09_215060: true
+DISA_STIG_RHEL_09_215101: true
 DISA_STIG_RHEL_09_231040: true
 DISA_STIG_RHEL_09_231045: true
 DISA_STIG_RHEL_09_231050: true
@@ -193,7 +195,6 @@ DISA_STIG_RHEL_09_411035: true
 DISA_STIG_RHEL_09_411050: true
 DISA_STIG_RHEL_09_411065: true
 DISA_STIG_RHEL_09_411075: true
-DISA_STIG_RHEL_09_411080: true
 DISA_STIG_RHEL_09_411090: true
 DISA_STIG_RHEL_09_411100: true
 DISA_STIG_RHEL_09_412035: true
@@ -275,7 +276,7 @@ accounts_password_set_min_life_existing: true
 accounts_password_set_warn_age_existing: true
 accounts_password_warn_age_login_defs: true
 accounts_passwords_pam_faillock_deny: true
-accounts_passwords_pam_faillock_deny_root: true
+accounts_passwords_pam_faillock_even_deny_root_or_root_unlock_time: true
 accounts_passwords_pam_faillock_unlock_time: true
 accounts_root_path_dirs_no_write: true
 accounts_set_post_pw_existing: true
@@ -386,6 +387,7 @@ enable_strategy: true
 ensure_gpgcheck_globally_activated: true
 ensure_gpgcheck_never_disabled: true
 ensure_pam_wheel_group_empty: true
+ensure_redhat_gpgkey_installed: true
 file_at_allow_exists: true
 file_at_deny_not_exist: true
 file_cron_allow_exists: true
@@ -546,6 +548,7 @@ package_nftables_installed: true
 package_nginx_removed: true
 package_openldap_clients_removed: true
 package_pam_pwquality_installed: true
+package_postfix_installed: true
 package_rsync_removed: true
 package_samba_removed: true
 package_setroubleshoot_removed: true
@@ -631,6 +634,5 @@ sysctl_net_ipv6_conf_default_accept_redirects: true
 sysctl_net_ipv6_conf_default_accept_source_route: true
 unknown_severity: true
 unknown_strategy: true
-use_pam_wheel_group_for_su: true
 wireless_disable_interfaces: true
 xwindows_runlevel_target: true
