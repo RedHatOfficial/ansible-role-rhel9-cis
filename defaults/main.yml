@@ -105,7 +105,6 @@ DISA_STIG_RHEL_09_231175: true
 DISA_STIG_RHEL_09_231180: true
 DISA_STIG_RHEL_09_231185: true
 DISA_STIG_RHEL_09_231195: true
-DISA_STIG_RHEL_09_232040: true
 DISA_STIG_RHEL_09_232050: true
 DISA_STIG_RHEL_09_232055: true
 DISA_STIG_RHEL_09_232060: true
@@ -229,7 +228,6 @@ DISA_STIG_RHEL_09_653040: true
 DISA_STIG_RHEL_09_653050: true
 DISA_STIG_RHEL_09_653070: true
 DISA_STIG_RHEL_09_653090: true
-DISA_STIG_RHEL_09_653110: true
 DISA_STIG_RHEL_09_653120: true
 DISA_STIG_RHEL_09_654015: true
 DISA_STIG_RHEL_09_654020: true
@@ -564,6 +562,7 @@ package_xorg_x11_server_common_removed: true
 postfix_network_listening_disabled: true
 reboot_required: true
 restrict_strategy: true
+rsyslog_filecreatemode: true
 rsyslog_files_groupownership: true
 rsyslog_files_ownership: true
 rsyslog_files_permissions: true
